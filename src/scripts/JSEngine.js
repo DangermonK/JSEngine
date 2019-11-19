@@ -7,6 +7,10 @@ function VectorSubtraction(v1, v2) {
     return new Vector(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z);
 }
 
+function VectorAddition(v1, v2) {
+    return new Vector(v1.x + v2.x, v1.y + v2.y, v1.z + v2.z);
+}
+
 function VectorMultiplication(v1, v2) {
     return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
 }
@@ -60,11 +64,14 @@ class Mesh {
     draw(ctx) {
         for(let i = 0; i < this.trisList.length; i++) {
             const n = this.calcNormals(i);
+            const v1 = this.vertexList[this.trisList[i].getVerts().v1];
+            const v2 = this.vertexList[this.trisList[i].getVerts().v2];
+            const v3 = this.vertexList[this.trisList[i].getVerts().v3];
+            
+            if(VectorMultiplication(n, new Vector(v1.x + v1.xOff + v2.x + v2.xOff + v3.x + v3.xOff,
+                v1.y + v1.yOff + v2.y + v2.yOff + v3.y + v3.yOff,
+                v1.z + v1.zOff + v2.z + v2.zOff + v3.z + v3.zOff,)) > 0) {
 
-            if(VectorMultiplication(n, new Vector(.9,0,1)) > 0) {
-                const v1 = this.vertexList[this.trisList[i].getVerts().v1];
-                const v2 = this.vertexList[this.trisList[i].getVerts().v2];
-                const v3 = this.vertexList[this.trisList[i].getVerts().v3];
                 ctx.beginPath();
                 ctx.moveTo(v1.getDisplayPoints().x, v1.getDisplayPoints().y);
                 ctx.lineTo(v2.getDisplayPoints().x, v2.getDisplayPoints().y);
