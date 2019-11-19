@@ -1,6 +1,18 @@
 const lens = 200;
 let centerX = 100, centerY = 100;
 
+/*functions*/
+
+function VectorSubtraction(v1, v2) {
+    return new Vector(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z);
+}
+
+function VectorMultiplication(v1, v2) {
+    return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
+}
+
+/*functions*/
+
 class Mesh {
 
     constructor(x,y,z) {
@@ -36,7 +48,7 @@ class Mesh {
     }
 
     addVertex(x,y,z) {
-        const v = new Vertex(x,y,z);
+        const v = new Vector(x,y,z);
         v.setOffset(this.x, this.y, this.z);
         this.vertexList[this.vertexList.length] = v;
     }
@@ -47,14 +59,34 @@ class Mesh {
 
     draw(ctx) {
         for(let i = 0; i < this.trisList.length; i++) {
-            ctx.beginPath();
-            ctx.moveTo(this.vertexList[this.trisList[i].getVerts().v1].getDisplayPoints().x, this.vertexList[this.trisList[i].getVerts().v1].getDisplayPoints().y);
-            ctx.lineTo(this.vertexList[this.trisList[i].getVerts().v2].getDisplayPoints().x, this.vertexList[this.trisList[i].getVerts().v2].getDisplayPoints().y);
-            ctx.lineTo(this.vertexList[this.trisList[i].getVerts().v3].getDisplayPoints().x, this.vertexList[this.trisList[i].getVerts().v3].getDisplayPoints().y);
-            ctx.lineTo(this.vertexList[this.trisList[i].getVerts().v1].getDisplayPoints().x, this.vertexList[this.trisList[i].getVerts().v1].getDisplayPoints().y);
-            ctx.stroke();
-            ctx.closePath();
+            const n = this.calcNormals(i);
+
+            if(VectorMultiplication(n, new Vector(.9,0,1)) > 0) {
+                const v1 = this.vertexList[this.trisList[i].getVerts().v1];
+                const v2 = this.vertexList[this.trisList[i].getVerts().v2];
+                const v3 = this.vertexList[this.trisList[i].getVerts().v3];
+                ctx.beginPath();
+                ctx.moveTo(v1.getDisplayPoints().x, v1.getDisplayPoints().y);
+                ctx.lineTo(v2.getDisplayPoints().x, v2.getDisplayPoints().y);
+                ctx.lineTo(v3.getDisplayPoints().x, v3.getDisplayPoints().y);
+                ctx.lineTo(v1.getDisplayPoints().x, v1.getDisplayPoints().y);
+                ctx.stroke();
+                ctx.closePath();
+            }
         }
+    }
+
+    calcNormals(index) {
+        const v1 = VectorSubtraction(this.vertexList[this.trisList[index].getVerts().v2], this.vertexList[this.trisList[index].getVerts().v1]);
+        const v2 = VectorSubtraction(this.vertexList[this.trisList[index].getVerts().v3], this.vertexList[this.trisList[index].getVerts().v1]);
+
+        const n = new Vector(
+            v1.y * v2.z - v1.z * v2.y,
+            v1.z * v2.x - v1.x * v2.z,
+            v1.x * v2.y - v1.y * v2.x);
+
+        return n;
+
     }
 
 }
@@ -79,7 +111,7 @@ class Triangle {
 
 }
 
-class Vertex {
+class Vector {
 
     constructor(x,y,z) {
         this.setPosition(x,y,z);
@@ -124,6 +156,14 @@ class Vertex {
 
         this.x = xC * Math.cos(alpha) - yC * Math.sin(alpha);
         this.y = xC * Math.sin(alpha) + yC * Math.cos(alpha);
+
+    }
+
+    scale(factor) {
+
+        this.x *= factor;
+        this.y *= factor;
+        this.z *= factor;
 
     }
 
