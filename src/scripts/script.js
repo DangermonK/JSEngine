@@ -1,7 +1,16 @@
 let canvas;
 let ctx;
 
-let t1, t2;
+let c1;
+
+function getRandomColor() {
+    let letters = '0123456789ABCDEF';
+    let color = '#';
+    for (let i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+}
 
 function Start() {
 
@@ -13,52 +22,106 @@ function Start() {
 
     centerX = canvas.width * 0.5;
     centerY = canvas.height * 0.5;
-    {
-        t2 = new Mesh(10, 0, 20);
-        t2.addVertex(5, 5, 5);
-        t2.addVertex(-5, 5, 5);
-        t2.addVertex(5, -5, 5);
-        t2.addVertex(-5, -5, 5);
 
-        t2.addVertex(5, 5, -5);
-        t2.addVertex(-5, 5, -5);
-        t2.addVertex(5, -5, -5);
-        t2.addVertex(-5, -5, -5);
+    document.addEventListener("keydown", function (e) {
+       switch(e.key) {
+           case 'w':
+               speedZ = 1;
+               break;
+           case 'a':
+               speedX = -1;
+               break;
+           case 's':
+               speedZ = -1;
+               break;
+           case 'd':
+               speedX = 1;
+               break;
+           case 'k':
+               speedY = -1;
+               break;
+           case 'm':
+               speedY = 1;
+               break;
+           case '2':
+               rotX = 1;
+               break;
+           case '8':
+               rotX = -1;
+               break;
+           case '4':
+               rotZ = -1;
+               break;
+           case '6':
+               rotZ = 1;
+               break;
+           case '7':
+               rotY = 1;
+               break;
+           case '9':
+               rotY = -1;
+               break;
+       }
+    });
 
-        t2.addTriangle(2, 1, 0);
-        t2.addTriangle(1, 2, 3);
+    document.addEventListener("keyup", function (e) {
+        switch(e.key) {
+            case 'w':
+                speedZ = 0;
+                break;
+            case 'a':
+                speedX = 0;
+                break;
+            case 's':
+                speedZ = 0;
+                break;
+            case 'd':
+                speedX = 0;
+                break;
+            case 'k':
+                speedY = 0;
+                break;
+            case 'm':
+                speedY = 0;
+                break;
+            case '8':
+                rotX = 0;
+                break;
+            case '2':
+                rotX = 0;
+                break;
+            case '4':
+                rotZ = 0;
+                break;
+            case '6':
+                rotZ = 0;
+                break;
+            case '7':
+                rotY = 0;
+                break;
+            case '9':
+                rotY = 0;
+                break;
+        }
+    });
 
-        t2.addTriangle(4, 2, 0);
-        t2.addTriangle(2, 4, 6);
-
-        t2.addTriangle(4, 5, 6);
-        t2.addTriangle(7, 6, 5);
-
-        t2.addTriangle(1, 3, 5);
-        t2.addTriangle(7, 5, 3);
-
-        t2.addTriangle(0, 1, 4);
-        t2.addTriangle(5, 4, 1);
-
-        t2.addTriangle(6, 3, 2);
-        t2.addTriangle(3, 6, 7);
-
-    }
+    c1 = new Cube(20, 20, 50, 10, 12, 7);
     setInterval(Update, 10);
 
 }
-let z = 0;
+let speedX = 0, speedZ = 0, speedY = 0, rotX = 0,rotY = 0,rotZ = 0;
+let rotScale = 0.01;
+
 function Update() {
 
+    c1.rotateX(rotX * rotScale);
+    c1.rotateY(rotY * rotScale);
+    c1.rotateZ(rotZ * rotScale);
 
-    t2.rotateX(-.01);
-    t2.rotateY(-.01);
+    c1.movePosition(speedX, speedY, speedZ);
 
     ctx.clearRect(0,0, canvas.width,canvas.height);
-    ctx.strokeStyle = "#000";
-
-    t2.draw(ctx);
-
+    c1.draw(ctx);
 
 
 }

@@ -15,7 +15,79 @@ function VectorMultiplication(v1, v2) {
     return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
 }
 
+function CalculateNormal(v1, v2) {
+
+    const n = new Vector(
+        v1.y * v2.z - v1.z * v2.y,
+        v1.z * v2.x - v1.x * v2.z,
+        v1.x * v2.y - v1.y * v2.x);
+
+    return n;
+
+}
+
 /*functions*/
+
+class Cube {
+
+    constructor(x,y,z,w,h,l) {
+        this.mesh = new Mesh(x,y,z);
+        this.mesh.addVertex(1 * w, 1 * h, 1 * l);
+        this.mesh.addVertex(-1 * w, 1 * h, 1 * l);
+        this.mesh.addVertex(1 * w, -1 * h, 1 * l);
+        this.mesh.addVertex(-1 * w, -1 * h, 1 * l);
+
+        this.mesh.addVertex(1 * w, 1 * h, -1 * l);
+        this.mesh.addVertex(-1 * w, 1 * h, -1 * l);
+        this.mesh.addVertex(1 * w, -1 * h, -1 * l);
+        this.mesh.addVertex(-1 * w, -1 * h, -1 * l);
+
+        this.mesh.addTriangle(2, 1, 0);
+        this.mesh.addTriangle(1, 2, 3);
+
+        this.mesh.addTriangle(4, 2, 0);
+        this.mesh.addTriangle(2, 4, 6);
+
+        this.mesh.addTriangle(4, 5, 6);
+        this.mesh.addTriangle(7, 6, 5);
+
+        this.mesh.addTriangle(1, 3, 5);
+        this.mesh.addTriangle(7, 5, 3);
+
+        this.mesh.addTriangle(0, 1, 4);
+        this.mesh.addTriangle(5, 4, 1);
+
+        this.mesh.addTriangle(6, 3, 2);
+        this.mesh.addTriangle(3, 6, 7);
+    }
+
+    setPosition(x,y,z) {
+        this.mesh.setPosition(x,y,z);
+    }
+
+    movePosition(x,y,z) {
+        this.mesh.movePosition(x,y,z);
+    }
+
+    rotateX(alpha) {
+        this.mesh.rotateX(alpha);
+    }
+
+
+    rotateY(alpha) {
+        this.mesh.rotateY(alpha);
+    }
+
+
+    rotateZ(alpha) {
+        this.mesh.rotateZ(alpha);
+    }
+
+    draw(ctx) {
+        this.mesh.draw(ctx);
+    }
+
+}
 
 class Mesh {
 
@@ -32,6 +104,16 @@ class Mesh {
 
         for(let i = 0; i < this.vertexList.length; i++) {
             this.vertexList[i].setOffset(x,y,z);
+        }
+    }
+
+    movePosition(x,y,z) {
+        this.x += x;
+        this.y += y;
+        this.z += z;
+
+        for(let i = 0; i < this.vertexList.length; i++) {
+            this.vertexList[i].setOffset(this.x,this.y,this.z);
         }
     }
 
@@ -63,39 +145,28 @@ class Mesh {
 
     draw(ctx) {
         for(let i = 0; i < this.trisList.length; i++) {
-            const n = this.calcNormals(i);
+
             const v1 = this.vertexList[this.trisList[i].getVerts().v1];
             const v2 = this.vertexList[this.trisList[i].getVerts().v2];
             const v3 = this.vertexList[this.trisList[i].getVerts().v3];
-            
+
+            const n = CalculateNormal(VectorSubtraction(v2, v1), VectorSubtraction(v3, v1));
+
             if(VectorMultiplication(n, new Vector(v1.x + v1.xOff + v2.x + v2.xOff + v3.x + v3.xOff,
                 v1.y + v1.yOff + v2.y + v2.yOff + v3.y + v3.yOff,
                 v1.z + v1.zOff + v2.z + v2.zOff + v3.z + v3.zOff,)) > 0) {
 
+                ctx.fillStyle = this.trisList[i].color;
                 ctx.beginPath();
                 ctx.moveTo(v1.getDisplayPoints().x, v1.getDisplayPoints().y);
                 ctx.lineTo(v2.getDisplayPoints().x, v2.getDisplayPoints().y);
                 ctx.lineTo(v3.getDisplayPoints().x, v3.getDisplayPoints().y);
                 ctx.lineTo(v1.getDisplayPoints().x, v1.getDisplayPoints().y);
-                ctx.stroke();
                 ctx.closePath();
+                ctx.fill();
             }
         }
     }
-
-    calcNormals(index) {
-        const v1 = VectorSubtraction(this.vertexList[this.trisList[index].getVerts().v2], this.vertexList[this.trisList[index].getVerts().v1]);
-        const v2 = VectorSubtraction(this.vertexList[this.trisList[index].getVerts().v3], this.vertexList[this.trisList[index].getVerts().v1]);
-
-        const n = new Vector(
-            v1.y * v2.z - v1.z * v2.y,
-            v1.z * v2.x - v1.x * v2.z,
-            v1.x * v2.y - v1.y * v2.x);
-
-        return n;
-
-    }
-
 }
 
 class Triangle {
@@ -104,6 +175,8 @@ class Triangle {
         this.v1 = v1;
         this.v2 = v2;
         this.v3 = v3;
+
+        this.color = getRandomColor();
     }
 
     getVerts() {
@@ -114,6 +187,12 @@ class Triangle {
             v3:this.v3
         }
 
+    }
+
+    flipNormal() {
+        const v = this.v1;
+        this.v1 = this.v3;
+        this.v3 = v;
     }
 
 }
