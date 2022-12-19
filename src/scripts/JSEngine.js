@@ -1,4 +1,4 @@
-const lens = 200;
+const lens = 800;
 let centerX = 100, centerY = 100;
 
 /*functions*/

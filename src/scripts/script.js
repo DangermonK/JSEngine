@@ -105,20 +105,25 @@ function Start() {
         }
     });
 
-    c1 = new Cube(20, 20, 50, 10, 12, 7);
-    setInterval(Update, 10);
+    c1 = new Cube(0, 0, 200, 10, 12, 7);
+    setInterval(Update, 16);
 
 }
-let speedX = 0, speedZ = 0, speedY = 0, rotX = 0,rotY = 0,rotZ = 0;
+let speedX = 0, speedZ = 0, speedY = 0, rotX = 1,rotY = 0.5,rotZ = 0;
 let rotScale = 0.01;
+let timer = 0;
 
 function Update() {
+
+    timer += 0.02
+    c1.setPosition(Math.sin(timer) * 50, Math.sin(timer * Math.PI * 0.5) * 40, Math.sin(timer * Math.PI * 0.25) * 130 + 200);
+    //speedY = Math.sin(timer + Math.pi*0.5) * 0.2;
 
     c1.rotateX(rotX * rotScale);
     c1.rotateY(rotY * rotScale);
     c1.rotateZ(rotZ * rotScale);
 
-    c1.movePosition(speedX, speedY, speedZ);
+    //c1.movePosition(speedX, speedY, speedZ);
 
     ctx.clearRect(0,0, canvas.width,canvas.height);
     c1.draw(ctx);
